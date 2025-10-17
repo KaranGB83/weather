@@ -1,5 +1,5 @@
 from flask import render_template, Flask, request, flash, session,redirect
-import pysqlite3 as sqlite3
+import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 from weather import get_weather
 
