@@ -1,4 +1,4 @@
-from flask import render_template, Flask, request, flash, session
+from flask import render_template, Flask, request, flash, session,redirect
 import pysqlite3 as sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 from weather import get_weather
@@ -30,18 +30,27 @@ def login():
     """Loging User"""
     #clear user id
     session.clear()
-    #ensuring username and password is entered
-    if not request.form.get("username"):
-        flash("Must provide Username")
+
+    if request.method=="POST":
+        #ensuring username and password is entered
+        if not request.form.get("username"):
+            flash("Must provide Username")
+            return render_template("login.html")
+        elif not request.form.get("password"):
+            flash("Must provide Password")
+            return render_template("login.html")
+        row = cursor.execute("SELECT * FROM users WHERE username=?", (request.form.get("username"),)).fetchone()
+        if row is None or not check_password_hash(row[2],request.form.get("password")):
+            flash('Invalid Credential, Try Again!', 'error')
+            return render_template("login.html")
+        
+        #remembering which user logged in
+        session["user_id"]=row[0]
+
+        flash(f'You are logged in {request.form.get("username")}','success')
+        return redirect("/")
+    else:
         return render_template("login.html")
-    elif not request.form.get("password"):
-        flash("Must provide Password")
-        return render_template("login.html")
-    row = cursor.execute("SELECT * FROM users WHERE username=?", request.form.get("username"))
-    if not row !=0 or check_password_hash(row[0]["hash"],request.form.get("password")):
-        flash('Invalid Credential, Try Again!', 'error')
-    
-    #remembering which user logged in
-    session["user_id"]=row[0]["id"]
+
     
     
