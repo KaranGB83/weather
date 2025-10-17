@@ -1,10 +1,24 @@
 {% extends "layout.html" %}
+
+{% block title %}
+    LOG IN
+{% endblock %}
+
 {% block body %}
-    <div>
-        <form action="login" method="post">
-            <input name="username" class="form-control" autofocus autocomplete="off" placeholder="Username" type="text">
-            <input name="password" class="form-control" autofocus autocomplete="off" placeholder="Password" type="password">
-            <button class="btn ">LOG IN</button>
-        </form>
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+        <div class="card shadow-sm p-4" style="width: 100%; max-width: 500px;">
+            <form action="/login" method="post">
+                <div class="mb-3">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Username" type="text">
+                </div>
+                <div class="mb-3">
+                    <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password">
+                </div>
+                <div class="container py-5 text-center">
+                    <button class="btn btn-primary" type="submit" >LOG IN</button>
+                </div>
+                
+            </form>
+        </div>
     </div>
-{% endblock%}
+{% endblock %}
