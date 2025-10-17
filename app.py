@@ -3,8 +3,9 @@ import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 from weather import get_weather
 
-conn=sqlite3.connect("weather.db") #connecting db
-cursor = conn.cursor() #creating object to interact with db
+#connecting db
+with sqlite3.connect("weather.db") as conn:
+    cursor = conn.cursor()#creating object to interact with db
 
 app = Flask(__name__)
 app.secret_key="ther"
@@ -18,11 +19,19 @@ def index():
             flash("Must Enter city for Weather!", 'error')
             return render_template("index.html")
         weather_info=get_weather(city)
-        if weather_info:
-            return render_template("weather.html",name=weather_info,city=city)
+        if "user_id" in session:
+            if weather_info:
+                cursor.execute("INSERT INTO history (user_id,city) VALUES (?,?)",(session["user_id"],city))
+                return render_template("weather.html",name=weather_info,city=city)
+            else:
+                flash("Could not found information for the city. Try Again!!!", 'error')
+                return render_template("index.html")
         else:
-            flash("Could not found information for the city. Try Again!!!", 'error')
-            return render_template("index.html")
+            if weather_info:
+                return render_template("weather.html",name=weather_info,city=city)
+            else:
+                flash("Could not found information for the city. Try Again!!!", 'error')
+                return render_template("index.html")
     return render_template("index.html")
     
 @app.route("/login", methods=["GET","POST"])
@@ -59,7 +68,7 @@ def logout():
     flash("You are logged out")
     return redirect("login.html")
 
-app.route("/register",methods=["GET","POST"])
+@app.route("/register",methods=["GET","POST"])
 def register():
     """Registering"""
     if request.method=="POST":
@@ -84,18 +93,28 @@ def register():
             return render_template("register.html") 
         hash=generate_password_hash(pw)
         cursor.execute("INSERT INTO users (username,hash) VALUES (?,?)",(username,hash))
-
+        conn.commit()
         #Fetching data
         rows=cursor.execute("SELECT id FROM users WHERE username=?",(username,)).fetchone()
-        conn.commit()
         #remembering which user logged in
         session["user_id"]=rows[0]
         #redirecting user to homepage
         flash(f"Your Account Has Been Created {username}", "success")
         return redirect("/")
+    
+    flash("Registration Failed!","error")
+    return render_template("register.html")
+
+@app.route("/history")
+def history():
+    if "user_id" not in session:
+        flash("Please log in to view your history","error")
+        return redirect("/login")
     else:
-        flash("Registration Failed!","success")
-        return render_template("register.html")
+        x=cursor.execute("SELECT time, city FROM history WHERE user_id=?",(session["user_id"],))
+        history=x.fetchall()
+        return render_template("history.html",history=history)
+
 
     
     
