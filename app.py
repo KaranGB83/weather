@@ -30,7 +30,8 @@ def index():
                 #connecting db and creating object to interact with db
                 with sqlite3.connect("weather.db") as conn:
                     cursor = conn.cursor()
-                cursor.execute("INSERT INTO history (user_id,city) VALUES (?,?)",(session["user_id"],city))
+                    cursor.execute("INSERT INTO history (user_id,city) VALUES (?,?)",(session["user_id"],city))
+                    conn.commit()
                 return render_template("weather.html",name=weather_info,city=city)
             else:
                 flash("Could not found information for the city. Try Again!!!", 'error')
@@ -125,7 +126,7 @@ def history():
     #connecting db and creating object to interact with db
     with sqlite3.connect("weather.db") as conn:
         cursor = conn.cursor()
-        x=cursor.execute("SELECT time, city FROM history WHERE user_id=?",(session["user_id"],))
+        x=cursor.execute("SELECT city, time FROM history WHERE user_id=?",(session["user_id"],))
         history=x.fetchall()
     return render_template("history.html",history=history)
         

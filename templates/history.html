@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    HISTORY
+{% endblock %}
+
+{% block body %}
+    <table class="table table-dark table-striped">
+        <thead>
+            <tr>
+                <th>City</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in history%}
+                <tr>
+                    <td>{{h["city"]}}</td>
+                    <td>{{h["time"]}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+{% endblock %}
