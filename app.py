@@ -2,14 +2,20 @@ from flask import render_template, Flask, request, flash, session,redirect
 import sqlite3
 from werkzeug.security import check_password_hash, generate_password_hash
 from weather import get_weather
-
-#connecting db
-with sqlite3.connect("weather.db") as conn:
-    cursor = conn.cursor()#creating object to interact with db
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key="ther"
 app.config['DEBUG'] = True
+
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwds):
+        if "user_id" not in session:
+            flash("Please log in first","error")
+            return redirect("/")
+        return f(*args, **kwds)
+    return wrapper
 
 @app.route("/", methods=["GET","POST"])
 def index():
@@ -21,6 +27,9 @@ def index():
         weather_info=get_weather(city)
         if "user_id" in session:
             if weather_info:
+                #connecting db and creating object to interact with db
+                with sqlite3.connect("weather.db") as conn:
+                    cursor = conn.cursor()
                 cursor.execute("INSERT INTO history (user_id,city) VALUES (?,?)",(session["user_id"],city))
                 return render_template("weather.html",name=weather_info,city=city)
             else:
@@ -48,7 +57,11 @@ def login():
         elif not request.form.get("password"):
             flash("Must provide Password","error")
             return render_template("login.html")
+        #connecting db and creating object to interact with db
+        with sqlite3.connect("weather.db") as conn:
+            cursor = conn.cursor()
         row = cursor.execute("SELECT * FROM users WHERE username=?", (request.form.get("username"),)).fetchone()
+        conn.commit()
         if row is None or not check_password_hash(row[2],request.form.get("password")):
             flash('Invalid Credential, Try Again!', 'error')
             return render_template("login.html")
@@ -65,8 +78,8 @@ def login():
 def logout():
     """Loging Out"""
     session.clear()
-    flash("You are logged out")
-    return redirect("login.html")
+    flash("You are logged out","info")
+    return redirect("/login")
 
 @app.route("/register",methods=["GET","POST"])
 def register():
@@ -87,6 +100,9 @@ def register():
         elif pw!=rpw:
             flash("Password Must Match", "error")
             return render_template("register.html")
+        #connecting db and creating object to interact with db
+        with sqlite3.connect("weather.db") as conn:
+            cursor = conn.cursor()
         existing_user=cursor.execute("SELECT * FROM users WHERE username=?",(username,)).fetchone()
         if existing_user:
             flash("Username Already Exist, Try different One", "error")
@@ -101,19 +117,18 @@ def register():
         #redirecting user to homepage
         flash(f"Your Account Has Been Created {username}", "success")
         return redirect("/")
-    
-    flash("Registration Failed!","error")
     return render_template("register.html")
 
 @app.route("/history")
+@login_required
 def history():
-    if "user_id" not in session:
-        flash("Please log in to view your history","error")
-        return redirect("/login")
-    else:
+    #connecting db and creating object to interact with db
+    with sqlite3.connect("weather.db") as conn:
+        cursor = conn.cursor()
         x=cursor.execute("SELECT time, city FROM history WHERE user_id=?",(session["user_id"],))
         history=x.fetchall()
-        return render_template("history.html",history=history)
+    return render_template("history.html",history=history)
+        
 
 
     
