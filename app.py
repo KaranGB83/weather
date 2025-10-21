@@ -6,7 +6,7 @@ from functools import wraps
 
 app = Flask(__name__)
 app.secret_key="ther"
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 
 def login_required(f):
     @wraps(f)
@@ -126,7 +126,7 @@ def history():
     #connecting db and creating object to interact with db
     with sqlite3.connect("weather.db") as conn:
         cursor = conn.cursor()
-        x=cursor.execute("SELECT city, time FROM history WHERE user_id=?",(session["user_id"],))
+        x=cursor.execute("SELECT city, time FROM history WHERE user_id=? ORDER BY time DESC",(session["user_id"],))
         history=x.fetchall()
     return render_template("history.html",history=history)
         
