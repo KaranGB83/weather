@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime, timezone
 from sys import argv
 
 API_KEY = '8d23c782004b031820da6026ceeb130f' 
@@ -13,8 +14,8 @@ def get_weather(city):
             humidity = info["main"]["humidity"]
             description = info["weather"][0]["description"]
             country = info["sys"]["country"]
-            sunrise = info["sys"]["sunrise"]
-            sunset  = info["sys"]["sunset"]
+            sunrise = datetime.fromtimestamp(info["sys"]["sunrise"],tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            sunset  = datetime.fromtimestamp(info["sys"]["sunset"],tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
             
             return {
                 "tempr": tempr,

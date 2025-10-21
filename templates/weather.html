@@ -10,8 +10,8 @@
             <li class="list-group-item"><i class="bi bi-cloud"></i> Description: {{ name.description }}</li>
             <li class="list-group-item"><i class="bi bi-thermometer-half"></i> Temperature: {{ name.tempr }}°C</li>
             <li class="list-group-item"><i class="bi bi-droplet"></i> Humidity: {{ name.humidity }}%</li>
-            <li class="list-group-item"><i class="bi bi-sunrise-fill"></i> Sunrise: {{ name.sunrise }}%</li>
-            <li class="list-group-item"><i class="bi bi-sunset"></i> Sunset: {{ name.sunset }}%</li>
+            <li class="list-group-item"><i class="bi bi-sunrise-fill"></i> Sunrise: {{ name.sunrise }}(UTC)</li>
+            <li class="list-group-item"><i class="bi bi-sunset"></i> Sunset: {{ name.sunset }}(UTC)</li>
         </ul>
         <div class="card-footer text-muted text-center">
             <i class="bi bi-globe"></i> Country Code: {{ name.country }}

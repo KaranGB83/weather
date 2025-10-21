@@ -5,21 +5,24 @@
 {% endblock %}
 
 {% block body %}
-    <table class="table table-dark table-striped">
-        <thead>
-            <tr>
-                <th>City</th>
-                <th>Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for h in history%}
+    <div class="container-mt4">
+        <h2>Search History</h2>
+        <table class="table table-dark table-striped">
+            <thead>
                 <tr>
-                    <td>{{h["city"]}}</td>
-                    <td>{{h["time"]}}</td>
+                    <th>City</th>
+                    <th>Time</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for h in history%}
+                    <tr>
+                        <td>{{h[0]}}</td>
+                        <td>{{h[1]}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     
 {% endblock %}
