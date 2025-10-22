@@ -6,7 +6,7 @@ from functools import wraps
 
 app = Flask(__name__)
 app.secret_key="ther"
-app.config['DEBUG'] = False
+app.config['DEBUG'] = True
 
 def login_required(f):
     @wraps(f)
@@ -61,8 +61,8 @@ def login():
         #connecting db and creating object to interact with db
         with sqlite3.connect("weather.db") as conn:
             cursor = conn.cursor()
-        row = cursor.execute("SELECT * FROM users WHERE username=?", (request.form.get("username"),)).fetchone()
-        conn.commit()
+            row = cursor.execute("SELECT * FROM users WHERE username=?", (request.form.get("username"),)).fetchone()
+            conn.commit()
         if row is None or not check_password_hash(row[2],request.form.get("password")):
             flash('Invalid Credential, Try Again!', 'error')
             return render_template("login.html")
@@ -104,13 +104,15 @@ def register():
         #connecting db and creating object to interact with db
         with sqlite3.connect("weather.db") as conn:
             cursor = conn.cursor()
-        existing_user=cursor.execute("SELECT * FROM users WHERE username=?",(username,)).fetchone()
+            existing_user=cursor.execute("SELECT * FROM users WHERE username=?",(username,)).fetchone()
         if existing_user:
             flash("Username Already Exist, Try different One", "error")
             return render_template("register.html") 
         hash=generate_password_hash(pw)
-        cursor.execute("INSERT INTO users (username,hash) VALUES (?,?)",(username,hash))
-        conn.commit()
+        with sqlite3.connect("weather.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (username,hash) VALUES (?,?)",(username,hash))
+            conn.commit()
         #Fetching data
         rows=cursor.execute("SELECT id FROM users WHERE username=?",(username,)).fetchone()
         #remembering which user logged in
@@ -130,7 +132,7 @@ def history():
         history=x.fetchall()
     return render_template("history.html",history=history)
 
-app.route("/account")
+@app.route("/account")
 @login_required
 def account():
     #for recent searches
