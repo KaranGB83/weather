@@ -26,8 +26,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbar">
-                <!-- <a class="nav-link active" aria-current="page" href="/">Home</a> -->
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 {% if session["user_id"] %}
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link active" href="/account"><i class="bi bi-person-circle"></i> ACCOUNT </a></li>
@@ -50,6 +49,25 @@
             </header>
             {% endif %}
         <main>{% block body %} {% endblock %}</main>
+        <footer class="mb-5">
+            <form action="https://validator.w3.org/check" class="text-center" enctype="multipart/form-data" method="post" target="_blank">
+                <input name="doctype" type="hidden" value="HTML5">
+                <input name="fragment" type="hidden">
+                <input alt="Validate" src="/static/I_heart_validator.png" type="image"> <!-- https://validator.w3.org/ -->
+            </form>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Adapted from https://stackoverflow.com/a/10162353
+                    const html = '<!DOCTYPE ' +
+                    document.doctype.name +
+                    (document.doctype.publicId ? ' PUBLIC "' + document.doctype.publicId + '"' : '') +
+                    (!document.doctype.publicId && document.doctype.systemId ? ' SYSTEM' : '') +
+                    (document.doctype.systemId ? ' "' + document.doctype.systemId + '"' : '') +
+                    '>\n' + document.documentElement.outerHTML;
+                    document.querySelector('form[action="https://validator.w3.org/check"] > input[name="fragment"]').value = html;
+                });
+            </script>
+        </footer>
         
     </body>
 </html>
