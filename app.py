@@ -129,6 +129,20 @@ def history():
         x=cursor.execute("SELECT city, time FROM history WHERE user_id=? ORDER BY time DESC",(session["user_id"],))
         history=x.fetchall()
     return render_template("history.html",history=history)
+
+app.route("/account")
+@login_required
+def account():
+    #for recent searches
+    with sqlite3.connect("weather.db") as conn:
+        cursor = conn.cursor()
+        x=cursor.execute("SELECT city, time FROM history WHERE user_id=? ORDER BY time DESC LIMIT 10",(session["user_id"],))
+        recent=x.fetchall()
+        #for username
+        cursor.execute("SELECT username FROM users WHERE id=?",(session["user_id"],))
+        username=cursor.fetchone()[0]
+    return render_template("account.html",recent=recent,username=username)
+
         
 
 
